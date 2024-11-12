@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ATBServer Products</title>
+</head>
+<body>
+    <h1>Products List</h1>
+    <ul id="productList"></ul>
+
+    <h2>Add New Product</h2>
+    <form id="addProductForm">
+        <label>Name:</label>
+        <input type="text" id="productName" required>
+        <label>Price:</label>
+        <input type="number" id="productPrice" required>
+        <button type="submit">Add Product</button>
+    </form>
+
+    <script>
+        async function fetchProducts() {
+            const response = await fetch('/products');
+            const products = await response.json();
+            const list = document.getElementById('productList');
+            list.innerHTML = '';
+            products.forEach(product => {
+                const li = document.createElement('li');
+                li.textContent = `${product.name} - $${product.price}`;
+                list.appendChild(li);
+            });
+        }
+
+        document.getElementById('addProductForm').onsubmit = async (event) => {
+            event.preventDefault();
+            const name = document.getElementById('productName').value;
+            const price = document.getElementById('productPrice').value;
+            
+            await fetch('/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `name=${name}&price=${price}`
+            });
+            fetchProducts();
+        };
+
+        fetchProducts();
+    </script>
+</body>
+</html>
